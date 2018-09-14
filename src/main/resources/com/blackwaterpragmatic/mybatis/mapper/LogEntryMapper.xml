@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.blackwaterpragmatic.mybatis.mapper.LogEntryMapper">
+
+	<select id="searchForIp" resultType="LogEntry">
+ 		select id, requestDate, ipAddress, request, status, userAgent
+		from LogEntries
+		where ipAddress = #{ipAddress}
+	</select>
+
+	<select id="search" resultType="SearchResult">
+		select * from (
+			select ipAddress, count(*) count
+			from LogEntries
+			where requestDate between #{startDate} and #{endDate}
+			group by ipAddress
+		) where count >= #{threshold}
+	</select>
+
+	<insert id="insert">
+ 		insert into LogEntries (requestDate, ipAddress, request, status, userAgent)
+		values (#{requestDate}, #{ipAddress}, #{request}, #{status}, #{userAgent})
+ 	</insert>
+
+	<insert id="insertSearchResult">
+ 		insert into SearchResults (ipAddress, count)
+		values (#{ipAddress}, #{count})
+ 	</insert>
+
+	<select id="listSearchResults" resultType="SearchResult">
+ 		select ipAddress, count
+		from SearchResults
+		order by count desc
+ 	</select>
+</mapper>
